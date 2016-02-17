@@ -1,0 +1,8 @@
+<div class="panel-collapse collapse" id="{{ category.name  }}Add"  role="tabpanel" aria-labelledby="{{ category.id }}">
+	<div class="input-group" >
+		<input type="text" class="form-control" ng-model="subcategoryCtrl.subcategory.name" placeholder="add new subcategory...">
+		<span class="input-group-btn">
+			<button class="btn btn-default" type="button" ng-click="subcategoryCtrl.addSubcategory(category)" >Add</button>
+		</span>
+	</div>				
+</div>

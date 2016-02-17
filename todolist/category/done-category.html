@@ -1,0 +1,23 @@
+<div class="panel panel-default" style="margin-top:5px" ng-controller="DoneController as doneCtrl">
+	<div class="panel-heading" role="tab" id="DoneCategory">
+		<h4 class="panel-title">
+			<a class="accordion-toggle collapsed title" data-toggle="collapse" data-parent="#DoneCategory" href="#Done" aria-expanded="false" aria-controls="Done"></a>
+			<span class="badge count">{{ doneCtrl.numberNotesInDone() }}</span>
+			<a>Done  {{efficency}}%</a>
+			
+			<div class="buttons">
+				<span class="glyphicon glyphicon-remove" style="float:right; margin-right: 10px;" ng-click="doneCtrl.clearDone()" ></span>			
+			</div>
+		</h4>
+	</div>
+	<div id="Done" class="panel-collapse collapse" role="tabpanel" aria-labelledby="DoneCategory">
+		<div ui-sortable="donelist.sortableOptions" class="list-group" ng-model="donelist" style="padding-top:10px; padding-bottom: 10px;">
+			<div class="note"  ng-repeat="note in donelist | filter:noteSearch" id="{{ note.id  }}" >
+				<a  editable-text="note.title" onbeforesave="updateLog($data,note.title)" title='{{( note.done | date:"dd-MMMM") }}'>{{ note.title || "empty" }} </a></edit-in-place> 
+				<div class="buttons">
+					<span class="glyphicon glyphicon-remove" style="float:right; margin-right: 10px;" ng-click="doneCtrl.deleteDoneNote($index)" ></span>
+				</div>
+			</div>	
+		</div> 
+	</div>
+</div>

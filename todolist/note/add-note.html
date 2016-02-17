@@ -1,0 +1,10 @@
+<div class="panel-collapse collapse" id="{{ subcategory.name  }}Add"  role="tabpanel" aria-labelledby="{{ subcategory.id }}" >
+	<div class="input-group" >
+		<input type="text" class="form-control" ng-model="noteCtrl.note.title" placeholder="add new note...">
+		<span class="input-group-btn">
+			<button type="button" class="btn btn-default datepicker" ng-click="open($event)" datepicker-popup="{{format}}" ng-requiered="true" ng-model="noteCtrl.note.start" is-open="status.opened" datepicker-options="dateOptions" close-text="Close"><i class="glyphicon glyphicon-calendar"></i></button>
+			<button class="btn btn-default" type="button" ng-click="noteCtrl.addNote(category,subcategory)">Add</button>
+		</span>
+		
+	</div>
+</div>

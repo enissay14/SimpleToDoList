@@ -1,0 +1,158 @@
+<html ng-app="SimpleTodoList">
+<head>
+	<meta charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="Simple todo List"/>
+	<meta name="author" content="Mohamed Yassine Landa">
+	
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/bootstrap-theme.min.css">
+	<link rel="stylesheet" href="css/jquery-ui.css">
+	<link rel="stylesheet" href="css/xeditable.css">
+	<link rel="stylesheet" href="css/style.css">
+	<link rel="stylesheet" href="css/ngDialog.css">
+	<link rel="stylesheet" href="css/ngDialog-theme-default.css">
+	<link rel="stylesheet" href="css/fullcalendar.min.css">
+	
+	<script src="js/libs/jquery.min.js"></script>
+	<script src="js/libs/bootstrap.min.js"></script>
+	<script src="js/libs/jquery-ui.js"></script>
+	<script src="js/libs/moment.min.js"></script>
+	<script src="js/libs/angular.min.js"></script>
+	<script src="js/libs/sortable.js"></script>
+	<script src="js/libs/angular-local-storage.js"></script>
+	<script src="js/libs/xeditable.js"></script>
+	<script src="js/libs/ui-bootstrap-tpls-0.13.3.min.js"></script>
+	<script src="js/libs/ngDialog.js"></script>
+	<script src="js/libs/calendar.js"></script>
+	<script src="js/libs/fullcalendar.min.js"></script>
+	<script src="js/libs/gcal.js"></script>
+	<script src="js/libs/jquery.mousewheel.min.js"></script>
+	
+	
+	<script src="js/app.js"></script>
+	<script src="js/services/repositories.js"></script>
+	<script src="js/entities/category.js"></script>
+	<script src="js/entities/subcategory.js"></script>
+	<script src="js/entities/note.js"></script>
+	<script src="js/entities/task.js"></script>
+	<script src="js/entities/donecategory.js"></script>
+	
+
+</head>
+
+<body>
+
+	<h1 style="text-align: center;">Simple Todo List
+	</br><small>by @YassineLanda</small></h1>
+	
+	</br>
+	
+	<div class="row" ng-controller="TodoListController as todolistCtrl" ng-init="init()">
+	<div id="calendar-btn">
+			<a ng-click="toggleCalendar()">calendar</a>
+		</div>		
+		<!-- Navigation Buttons -->
+		  <div id="navigation" class="col-md-2 col-md-offset-2">
+			<ul class="nav nav-pills nav-stacked" id="myTabs">
+			  <li class="active"><a href="#home">Notes</a></li>
+			  <li><a href="#profile">Entries</a></li>
+			  <li><a href="#messages">About</a></li>
+			</ul>
+		  </div>
+		
+		<!-- To Do List -->
+		<div id="todolist" class="col-md-4" >
+			<!-- Category Panel -->
+			<div class="panel-group ng-cloak" id="category"   role="tablist" aria-multiselectable="true">
+				
+				<!-- Categories -->
+				<div class="panel panel-default wheelExpandCategory droppable" ng-repeat="category in todolist">
+				
+					<div class="panel-heading  " role="tab" id="{{ category.id }}" ng-controller="CategoryController as categoryCtrl">
+						<div class="panel-title">
+							<a class="accordion-toggle commandcollapse title collapsed" data-toggle="collapse" data-parent="#{{ category.id }}" href="#{{ category.name }}" aria-expanded="false" ng-click="switchAdd(category.name)" aria-controls="{{ category.name }}"></a>
+							<span class="badge count">{{ category.pending }}</span>
+							<a editable-text="category.name" onbeforesave="updateLog($data,category.name)" e-form="textBtnForm" ng-dblclick="textBtnForm.$show()"> {{ category.name || "empty" }}</a>
+							<div class="buttons">
+								<span class="glyphicon glyphicon-plus" style=" margin-right: 10px;" data-toggle="collapse" href="#{{ category.name  }}Add" aria-expanded="false" aria-controls="add" ng-show="showAdd[category.name]"></span>
+								<span class="glyphicon glyphicon-remove" style=" margin-right: 10px;" ng-click="categoryCtrl.deleteCategory(category)" ></span>									
+							</div>
+						</div>
+					</div>
+					
+					<div class="panel-collapse collapse" id="{{ category.name }}"  role="tabpanel" aria-labelledby="{{ category.id }}" ng-controller="SubCategoryController as subcategoryCtrl">
+					
+						<!-- SubCategory Panel -->
+						<add-subcategory></add-subcategory>
+						<div ui-sortable="category.sortableOptions" ng-model="category.subcategories" class="panel-group" id="todo" role="tablist" aria-multiselectable="true">
+							
+							<!-- SubCategories -->
+							<div class="subcategory panel wheelExpandSubCategory panel-primary" ng-repeat="subcategory in category.subcategories | filter:noteSearch"> 
+								
+								<div class="panel-heading" role="tab" id="{{ subcategory.id }}">
+									<div class="panel-title">
+										<a class="accordion-toggle title collapsed" data-toggle="collapse" data-parent="#{{ subcategory.id }}" href="#{{ subcategory.name  }}" aria-expanded="false" ng-click="switchAdd(subcategory.name )" aria-controls="{{ subcategory.name  }}"></a>
+										<span class="badge count">{{ subcategory.pending }}</span>
+										<a  editable-text="subcategory.name" onbeforesave="updateLog($data,subcategory.name)" e-form="textBtnForm" ng-dblclick="textBtnForm.$show()"> {{ subcategory.name || "empty" }}</a>
+										<div class="buttons">
+											<span class="glyphicon glyphicon-plus" id="{{ subcategory.name  }}Button" style=" margin-right: 10px;" data-toggle="collapse" href="#{{ subcategory.name  }}Add "  aria-expanded="false" aria-controls="add" ng-show="showAdd[subcategory.name]"></span>
+											<span class="glyphicon glyphicon-remove" style="float:right; margin-right: 10px;" ng-click="subcategoryCtrl.deleteSubcategory(category,subcategory)"></span>
+										</div>
+									</div>
+								</div>
+								
+								<div class="panel-collapse collapse" id="{{ subcategory.name  }}"  role="tabpanel" aria-labelledby="{{ subcategory.id }}" ng-controller="NoteController as noteCtrl">
+									
+									<!-- Notes -->
+									<add-note></add-note>
+									<div ui-sortable="subcategory.sortableOptions" class="list-group" ng-model="subcategory.notes" style="padding-top:10px; padding-bottom: 10px;" >
+										
+										<div class="note" ng-repeat="note in subcategory.notes track by $index " id="{{ note.id  }}" >
+											<a>{{$index + 1}}</a>
+											<a  editable-text="note.title" onbeforesave="updateLog($data,note.title)" >{{ note.title || "empty" }} </a>
+											<a editable-bsdate="note.start" onshow="openPicker()" onhide="closePicker()" e-is-open="picker.opened" e-datepicker-popup="dd-MMMM-yyyy" onbeforesave="updateDeadLine(note,$data,note.start)" >{{( note.start | date:"dd-MMMM") || "empty" }}</a>
+											<div class="buttons">
+												<span class="glyphicon glyphicon-search" style=" margin-right: 10px;" ng-click="clickToOpen(note)" ></span>
+												<span class="glyphicon glyphicon-remove" style="float:right; margin-right: 10px;" ng-click="noteCtrl.deleteNote(category,subcategory,note)" ></span>
+											</div>
+										</div>
+									</div> 
+									<!-- End Notes -->
+								</div>
+							</div> 
+							<!-- End SubCategories -->
+						</div> 
+						<!-- End SubCategory Panel -->
+					</div>
+				</div> 
+				<!-- End Categories -->
+				
+				<done-category></done-category>	
+				<add-category></add-category>
+				<!--Tasks -->
+				<!-- <div ng-controller="TaskController as taskCtrl" ng-repeat="task in tasks">{{ task.id }} {{ task.title }} {{ task.description }} {{ task.start | date:"dd-MMM" }}</div> -->
+			</div> 
+			<!-- End Category Panel -->
+			
+		  
+		</div>	
+		
+		<!-- Sidebar -->
+		<div id="sidebar" class="debug col-md-2">
+			<!-- Search -->	
+			<div class="input-group">
+				<input type="search" class="form-control" placeholder="Filter" ng-model="noteSearch">
+			</div>
+			<!-- Log -->
+			<h3>Latest Activities</h3>
+			<p  ng-repeat="logEntry in sortinglog.slice().reverse() | limitTo:6" ng-bind-html="logEntry | unsafe"></p>
+			<a style="float:right; margin-right: 10px;" ng-click="clearLog()" href="" ng-show="sortinglog.length">Clear Log</a>
+		</div>
+		
+		<!-- Calendar -->
+		<div id="calendar" config="uiConfig.calendar"  calendar="myCalendar" ui-calendar="uiConfig.calendar" ng-model="eventSources"></div>
+	</div>
+</body>
+</html>
